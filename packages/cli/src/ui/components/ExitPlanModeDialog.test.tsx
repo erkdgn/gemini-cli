@@ -597,6 +597,49 @@ Implement a comprehensive authentication system with multiple providers.
           );
         });
       });
+
+      it('shows all 3 options even in small terminal heights', async () => {
+        const { lastFrame } = await renderWithProviders(
+          <ExitPlanModeDialog
+            planPath={mockPlanFullPath}
+            onApprove={onApprove}
+            onFeedback={onFeedback}
+            onCancel={onCancel}
+            getPreferredEditor={vi.fn()}
+            width={80}
+            availableHeight={20} // Small height
+          />,
+          {
+            config: {
+              getTargetDir: () => mockTargetDir,
+              getIdeMode: () => false,
+              isTrustedFolder: () => true,
+              storage: {
+                getPlansDir: () => mockPlansDir,
+              },
+              getFileSystemService: (): FileSystemService => ({
+                readTextFile: vi.fn(),
+                writeTextFile: vi.fn(),
+              }),
+              getUseAlternateBuffer: () => useAlternateBuffer ?? true,
+            } as unknown as import('@google/gemini-cli-core').Config,
+            settings: createMockSettings({
+              ui: { useAlternateBuffer },
+            }),
+          },
+        );
+
+        await act(async () => {
+          vi.runAllTimers();
+        });
+
+        await waitFor(() => {
+          expect(lastFrame()).toContain('Add user authentication');
+          expect(lastFrame()).toContain('1.  Yes, automatically accept edits');
+          expect(lastFrame()).toContain('2.  Yes, manually accept edits');
+          expect(lastFrame()).toContain('3.  Type your feedback...');
+        });
+      });
     },
   );
 });
