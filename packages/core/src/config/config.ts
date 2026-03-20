@@ -3252,7 +3252,10 @@ export class Config implements McpContext, AgentLoopContext {
         !this.isAgentsEnabled() ||
         agentsOverrides[agentName]?.enabled === false
       ) {
-        registry.unregisterTool(agentName);
+        const tool = registry.getTool(agentName);
+        if (tool instanceof SubagentTool) {
+          registry.unregisterTool(agentName);
+        }
       }
     }
 
