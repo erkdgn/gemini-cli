@@ -244,3 +244,4 @@ export * from './voice/responseFormatter.js';
 
 // Export types from @google/genai
 export type { Content, Part, FunctionCall } from '@google/genai';
+// Trigger steering detection: ToolDefinition
